@@ -1,4 +1,5 @@
 require "akeneo/api/product"
+require "akeneo/api/product_set"
 
 module Akeneo::Api
     class Client
@@ -44,8 +45,13 @@ module Akeneo::Api
             return Product.new(JSON.parse(res.body))
         end
 
-        def products
-            product_uri = URI("#{@uri}/api/rest/v1/products")
+        def products(options = {})
+            product_uri = ''
+            if (!options[:uri].nil?) then
+                product_uri = URI(options[:uri])
+            else
+                product_uri = URI("#{@uri}/api/rest/v1/products")
+            end
             query = Net::HTTP::Get.new(product_uri)
             query.content_type = 'application/json'
             query['authorization'] = 'Bearer ' + @access_token
@@ -54,7 +60,7 @@ module Akeneo::Api
               http.request(query)
             end
 
-            return Product.new(JSON.parse(res.body))
+            return ProductSet.new(self, JSON.parse(res.body))
         end
     end
 end

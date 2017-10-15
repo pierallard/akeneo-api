@@ -1,7 +1,7 @@
 module Akeneo::Api
     class Product
         attr_accessor :identifier, :enabled, :family, :categories, :groups, :parent, :values, :attribute_code,
-            :associations, :association_type_code, :created, :updated
+            :associations, :created, :updated
 
         def initialize(params)
             @identifier = params['identifier']
@@ -13,7 +13,6 @@ module Akeneo::Api
             @values = params['value']
             @attribute_code = params['attributeCode']
             @associations = params['associations']
-            @association_type_code = params['associationTypeCode']
             @created = Time.parse(params['created'])
             @updated = Time.parse(params['updated'])
         end

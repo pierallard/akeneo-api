@@ -21,6 +21,9 @@ Next, you can access to entities using the same [API reference](https://api.aken
 
     product = client.product('11704300')
     print product.identifier
+    
+    products = client.products
+    product.each{|p| print p.identifier}
 
 ## Development
 

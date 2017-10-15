@@ -1,3 +1,5 @@
-module Akeneo::Api
-    VERSION = "0.0.1"
+module Akeneo
+    module Api
+        VERSION = "0.0.1"
+    end
 end
