@@ -1,4 +1,4 @@
-module Akeneo::Api
+module Akeneo::Api::Entity
     class Product
         attr_accessor :identifier, :enabled, :family, :categories, :groups, :parent, :values, :attribute_code,
             :associations, :created, :updated

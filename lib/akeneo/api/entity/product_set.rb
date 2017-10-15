@@ -1,4 +1,4 @@
-module Akeneo::Api
+module Akeneo::Api::Entity
     class ProductSet
         attr_accessor :client, :first_page_uri, :previous_page_uri, :next_page_uri, :current_page, :items, :items_count
 
