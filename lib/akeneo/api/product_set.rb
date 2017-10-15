@@ -1,6 +1,6 @@
 module Akeneo::Api
     class ProductSet
-        attr_accessor :client, :first_page_uri, :previous_page_uri, :next_page_uri, :current_page, :items
+        attr_accessor :client, :first_page_uri, :previous_page_uri, :next_page_uri, :current_page, :items, :items_count
 
         delegate :count, to: :@items
         delegate :first, to: :@items
@@ -8,13 +8,14 @@ module Akeneo::Api
 
         def initialize(client, params)
             @client = client
-            @first_page_uri = params['_links']['first']['href']
+            @first_page_uri = params['_links']['first'].try(:[], 'href')
             @previous_page_uri = params['_links']['previous'].try(:[], 'href')
             @next_page_uri = params['_links']['next'].try(:[], 'href')
             @current_page = params['current_page']
             @items = params['_embedded']['items'].map do |item|
                 Product.new(item)
             end
+            @items_count = params['items_count']
         end
 
         def each

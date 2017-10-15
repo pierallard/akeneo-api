@@ -25,6 +25,17 @@ Next, you can access to entities using the same [API reference](https://api.aken
     products = client.products
     product.each{|p| print p.identifier}
 
+You can use complex filters on products as defined [here](https://api.akeneo.com/api-reference.html#get_products)
+
+    products = client.products({
+        scope: 'ecommerce',
+        locales: ['en_US'],
+        attributes: ['sku'],
+        page: 42,
+        limit: 20,
+        with_count: true
+    })
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
