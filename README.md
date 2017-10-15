@@ -25,9 +25,12 @@ Next, you can access to entities using the same [API reference](https://api.aken
     products = client.products
     product.each{|p| print p.identifier}
 
-You can use complex filters on products as defined [here](https://api.akeneo.com/api-reference.html#get_products)
+You can use [more arguments](https://api.akeneo.com/api-reference.html#get_products) or [filters](https://api.akeneo.com/documentation/filter.html) on products
 
     products = client.products({
+        search: {
+            'enabled': [{ operator: '=', value: true }]
+        },
         scope: 'ecommerce',
         locales: ['en_US'],
         attributes: ['sku'],
