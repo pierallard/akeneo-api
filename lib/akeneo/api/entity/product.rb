@@ -1,5 +1,6 @@
 require 'time'
 require 'active_support/core_ext/hash/indifferent_access'
+require 'akeneo/api/no_client_exception'
 
 module Akeneo::Api::Entity
     class Product
@@ -25,9 +26,7 @@ module Akeneo::Api::Entity
         end
 
         def save
-            if (@_client.nil?) then
-                raise 'You have to use _client'
-            end
+            raise Akeneo::Api::NoClientException if (@_client.nil?)
 
             @_client.products.save(self)
         end

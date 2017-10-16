@@ -1,5 +1,6 @@
 require "akeneo/api/entity/product"
 require "akeneo/api/entity/product_set"
+require 'akeneo/api/query_exception'
 
 module Akeneo::Api::ClientEndpoint
     class Product
@@ -22,8 +23,13 @@ module Akeneo::Api::ClientEndpoint
             end
 
             if (!res.kind_of? Net::HTTPSuccess) then
-                raise res.body
+                if (res.code.to_i == 404) then
+                    return nil
+                else
+                    raise Akeneo::Api::QueryException.new(res.body)
+                end
             end
+
             return Akeneo::Api::Entity::Product.new(JSON.parse(res.body).merge({ _client: @_client, _persisted: true }))
         end
 
@@ -65,9 +71,8 @@ module Akeneo::Api::ClientEndpoint
               http.request(query)
             end
 
-            if (!res.kind_of? Net::HTTPSuccess) then
-                raise res.body
-            end
+            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
+
             return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ _client: @_client }))
         end
 
@@ -97,9 +102,7 @@ module Akeneo::Api::ClientEndpoint
                 http.request(query)
             end
 
-            if (!res.kind_of? Net::HTTPSuccess) then
-                raise res.body
-            end
+            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
 
             product._persisted = true
 
