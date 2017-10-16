@@ -3,19 +3,19 @@ require "akeneo/api/entity/product_set"
 
 module Akeneo::Api::ClientEndpoint
     class Product
-        def initialize(client)
-            @client = client
+        def initialize(_client)
+            @_client = _client
         end
 
         def new(params = {})
-            return Akeneo::Api::Entity::Product.new(params.merge({ client: @client }))
+            return Akeneo::Api::Entity::Product.new(params.merge({ _client: @_client }))
         end
 
         def find(sku)
-            product_uri = URI("#{@client.uri}/api/rest/v1/products/#{sku}")
+            product_uri = URI("#{@_client.uri}/api/rest/v1/products/#{sku}")
             query = Net::HTTP::Get.new(product_uri)
             query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @client.access_token
+            query['authorization'] = 'Bearer ' + @_client.access_token
 
             res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
               http.request(query)
@@ -24,7 +24,7 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::Product.new(JSON.parse(res.body).merge({ client: @client }))
+            return Akeneo::Api::Entity::Product.new(JSON.parse(res.body).merge({ _client: @_client, _persisted: true }))
         end
 
         def where(options = {})
@@ -32,7 +32,7 @@ module Akeneo::Api::ClientEndpoint
             if (!options[:uri].nil?) then
                 product_uri = URI(options[:uri])
             else
-                product_uri = URI("#{@client.uri}/api/rest/v1/products")
+                product_uri = URI("#{@_client.uri}/api/rest/v1/products")
                 params = {}
                 if (!options[:scope].nil?) then
                     params[:scope] = options[:scope]
@@ -59,7 +59,7 @@ module Akeneo::Api::ClientEndpoint
             end
             query = Net::HTTP::Get.new(product_uri)
             query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @client.access_token
+            query['authorization'] = 'Bearer ' + @_client.access_token
 
             res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
               http.request(query)
@@ -68,14 +68,20 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ client: @client }))
+            return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ _client: @_client }))
         end
 
         def save(product)
-            product_uri = URI("#{@client.uri}/api/rest/v1/products")
-            query = Net::HTTP::Post.new(product_uri)
+            if (!product._persisted) then
+                product_uri = URI("#{@_client.uri}/api/rest/v1/products")
+                query = Net::HTTP::Post.new(product_uri)
+            else
+                product_uri = URI("#{@_client.uri}/api/rest/v1/products/#{product.identifier}")
+                query = Net::HTTP::Patch.new(product_uri)
+            end
+
             query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @client.access_token
+            query['authorization'] = 'Bearer ' + @_client.access_token
             query.body = JSON.generate({
                 identifier: product.identifier,
                 enabled: product.enabled,
@@ -94,6 +100,8 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
+
+            product._persisted = true
 
             return true
         end

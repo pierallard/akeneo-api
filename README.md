@@ -39,10 +39,12 @@ You can use [more arguments](https://api.akeneo.com/api-reference.html#get_produ
         with_count: true
     })
 
-You can save entities like this:
+You can save new entities or existing entities like this:
 
     product = client.products.new
     product.identifier = 'foo'
+    product.save
+    product.enabled = false
     product.save
 
 ## Development
