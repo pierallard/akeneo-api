@@ -2,11 +2,12 @@ require "akeneo/api/client_endpoint/product"
 
 module Akeneo::Api
     class Client
-        include ClientEndpoint::Product
+        attr_accessor :products, :uri, :access_token
 
         def initialize(uri)
             @uri = uri
             @access_token = nil
+            @products = ClientEndpoint::Product.new(self)
         end
 
         def is_authentified?

@@ -2,14 +2,16 @@ require "akeneo/api/entity/product"
 require "akeneo/api/entity/product_set"
 
 module Akeneo::Api::ClientEndpoint
-    module Product
-        extend ActiveSupport::Concern
+    class Product
+        def initialize(client)
+            @client = client
+        end
 
-        def product(sku)
-            product_uri = URI("#{@uri}/api/rest/v1/products/#{sku}")
+        def find(sku)
+            product_uri = URI("#{@client.uri}/api/rest/v1/products/#{sku}")
             query = Net::HTTP::Get.new(product_uri)
             query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @access_token
+            query['authorization'] = 'Bearer ' + @client.access_token
 
             res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
               http.request(query)
@@ -21,12 +23,12 @@ module Akeneo::Api::ClientEndpoint
             return Akeneo::Api::Entity::Product.new(JSON.parse(res.body))
         end
 
-        def products(options = {})
+        def where(options = {})
             product_uri = ''
             if (!options[:uri].nil?) then
                 product_uri = URI(options[:uri])
             else
-                product_uri = URI("#{@uri}/api/rest/v1/products")
+                product_uri = URI("#{@client.uri}/api/rest/v1/products")
                 params = {}
                 if (!options[:scope].nil?) then
                     params[:scope] = options[:scope]
@@ -53,7 +55,7 @@ module Akeneo::Api::ClientEndpoint
             end
             query = Net::HTTP::Get.new(product_uri)
             query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @access_token
+            query['authorization'] = 'Bearer ' + @client.access_token
 
             res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
               http.request(query)

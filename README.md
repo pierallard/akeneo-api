@@ -19,15 +19,15 @@ If you don't have any client id, let's take a look at [this page](https://api.ak
 
 Next, you can access to entities using the same [API reference](https://api.akeneo.com/api-reference.html).
 
-    product = client.product('11704300')
+    product = client.products.find('11704300')
     print product.identifier
     
-    products = client.products
+    products = client.products.where
     product.each{|p| print p.identifier}
 
 You can use [more arguments](https://api.akeneo.com/api-reference.html#get_products) or [filters](https://api.akeneo.com/documentation/filter.html) on products
 
-    products = client.products({
+    products = client.products.where({
         search: {
             'enabled': [{ operator: '=', value: true }]
         },
