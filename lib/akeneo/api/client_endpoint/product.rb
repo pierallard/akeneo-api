@@ -7,6 +7,10 @@ module Akeneo::Api::ClientEndpoint
             @client = client
         end
 
+        def new(params)
+            return Akeneo::Api::Entity::Product.new(@client, params)
+        end
+
         def find(sku)
             product_uri = URI("#{@client.uri}/api/rest/v1/products/#{sku}")
             query = Net::HTTP::Get.new(product_uri)
@@ -20,7 +24,7 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::Product.new(JSON.parse(res.body))
+            return Akeneo::Api::Entity::Product.new(@client, JSON.parse(res.body))
         end
 
         def where(options = {})
@@ -49,7 +53,7 @@ module Akeneo::Api::ClientEndpoint
                     params[:with_count] = options[:with_count]
                 end
                 if (!options[:search].nil?) then
-                    params[:search] = options[:search].to_json
+                    params[:search] = JSON.generate(options[:search])
                 end
                 product_uri.query = URI.encode_www_form(params)
             end
@@ -64,7 +68,11 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::ProductSet.new(self, JSON.parse(res.body))
+            return Akeneo::Api::Entity::ProductSet.new(@client, JSON.parse(res.body))
+        end
+
+        def save
+            raise NotImplementedError
         end
     end
 end

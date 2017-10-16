@@ -1,4 +1,6 @@
 require "akeneo/api/client_endpoint/product"
+require 'net/http'
+require 'json'
 
 module Akeneo::Api
     class Client
@@ -20,11 +22,11 @@ module Akeneo::Api
             query = Net::HTTP::Post.new(token_uri)
             query.content_type = 'application/json'
             query.basic_auth(token, secret)
-            query.body = {
+            query.body = JSON.generate({
                 grant_type: 'password',
                 username: username,
                 password: password
-            }.to_json
+            })
 
             res = Net::HTTP.start(token_uri.hostname, token_uri.port) do |http|
                 http.request(query)

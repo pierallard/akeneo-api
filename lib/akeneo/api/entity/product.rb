@@ -1,9 +1,13 @@
+require 'time'
+
 module Akeneo::Api::Entity
     class Product
         attr_accessor :identifier, :enabled, :family, :categories, :groups, :parent, :values, :attribute_code,
-            :associations, :created, :updated
+            :associations, :created, :updated, :client
 
-        def initialize(params)
+        def initialize(client, params)
+            @client = client
+
             @identifier = params['identifier']
             @enabled = params['boolean']
             @family = params['family']
@@ -15,6 +19,10 @@ module Akeneo::Api::Entity
             @associations = params['associations']
             @created = Time.parse(params['created'])
             @updated = Time.parse(params['updated'])
+        end
+
+        def save
+            @client.products.save(self)
         end
     end
 end
