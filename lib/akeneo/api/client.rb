@@ -1,4 +1,5 @@
 require "akeneo/api/client_endpoint/product"
+require "akeneo/api/client_endpoint/family"
 require 'net/http'
 require 'json'
 
@@ -43,6 +44,10 @@ module Akeneo::Api
 
         def products
             return ClientEndpoint::Product.new(self)
+        end
+
+        def families
+            return ClientEndpoint::Family.new(self)
         end
     end
 end

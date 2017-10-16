@@ -1,36 +1,30 @@
 require "akeneo/api/entity/product"
+require "akeneo/api/entity/family"
 require "akeneo/api/entity/product_set"
 require 'akeneo/api/query_exception'
+require "akeneo/api/client_endpoint/abstract"
 
 module Akeneo::Api::ClientEndpoint
-    class Product
-        def initialize(_client)
-            @_client = _client
+    class Product < Abstract
+        def self::entityClass
+            Akeneo::Api::Entity::Product
         end
 
-        def new(params = {})
-            return Akeneo::Api::Entity::Product.new(params.merge({ _client: @_client }))
+        def self::url
+            return 'products'
         end
 
-        def find(sku)
-            product_uri = URI("#{@_client.uri}/api/rest/v1/products/#{sku}")
-            query = Net::HTTP::Get.new(product_uri)
-            query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @_client.access_token
-
-            res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
-              http.request(query)
+        def self::map_from_api(client, params)
+            if (!params['family'].nil?) then
+                params['family'] = Akeneo::Api::Entity::Family.new({
+                    code: params['family'],
+                    _client: client,
+                    _persisted: true,
+                    _loaded: false,
+                })
             end
 
-            if (!res.kind_of? Net::HTTPSuccess) then
-                if (res.code.to_i == 404) then
-                    return nil
-                else
-                    raise Akeneo::Api::QueryException.new(res.body)
-                end
-            end
-
-            return Akeneo::Api::Entity::Product.new(JSON.parse(res.body).merge({ _client: @_client, _persisted: true }))
+            return params
         end
 
         def where(options = {})
@@ -90,7 +84,7 @@ module Akeneo::Api::ClientEndpoint
             query.body = JSON.generate({
                 identifier: product.identifier,
                 enabled: product.enabled,
-                family: product.family,
+                family: product.family.try(:code),
                 categories: product.categories,
                 groups: product.groups,
                 parent: product.parent,
@@ -102,6 +96,7 @@ module Akeneo::Api::ClientEndpoint
                 http.request(query)
             end
 
+            print res.body
             raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
 
             product._persisted = true
