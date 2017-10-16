@@ -8,15 +8,15 @@ module Akeneo::Api::Entity
 
         def_delegators :@items, :count, :first, :last
 
-        def initialize(client, params)
-            @client = client
+        def initialize(params)
+            @client = params['client']
 
             @first_page_uri = params['_links']['first'].try(:[], 'href')
             @previous_page_uri = params['_links']['previous'].try(:[], 'href')
             @next_page_uri = params['_links']['next'].try(:[], 'href')
             @current_page = params['current_page']
             @items = params['_embedded']['items'].map do |item|
-                Product.new(@client, item)
+                Product.new(item.merge({ client: @client }))
             end
             @items_count = params['items_count']
         end

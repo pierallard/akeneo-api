@@ -4,12 +4,11 @@ require 'json'
 
 module Akeneo::Api
     class Client
-        attr_accessor :products, :uri, :access_token
+        attr_accessor :uri, :access_token
 
         def initialize(uri)
             @uri = uri
             @access_token = nil
-            @products = ClientEndpoint::Product.new(self)
         end
 
         def is_authentified?
@@ -38,6 +37,12 @@ module Akeneo::Api
 
             data = JSON.parse(res.body)
             @access_token = data['access_token']
+
+            return self
+        end
+
+        def products
+            return ClientEndpoint::Product.new(self)
         end
     end
 end

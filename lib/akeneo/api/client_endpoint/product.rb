@@ -7,8 +7,8 @@ module Akeneo::Api::ClientEndpoint
             @client = client
         end
 
-        def new(params)
-            return Akeneo::Api::Entity::Product.new(@client, params)
+        def new(params = {})
+            return Akeneo::Api::Entity::Product.new(params.merge({ client: @client }))
         end
 
         def find(sku)
@@ -24,7 +24,7 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::Product.new(@client, JSON.parse(res.body))
+            return Akeneo::Api::Entity::Product.new(JSON.parse(res.body).merge({ client: @client }))
         end
 
         def where(options = {})
@@ -68,11 +68,34 @@ module Akeneo::Api::ClientEndpoint
             if (!res.kind_of? Net::HTTPSuccess) then
                 raise res.body
             end
-            return Akeneo::Api::Entity::ProductSet.new(@client, JSON.parse(res.body))
+            return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ client: @client }))
         end
 
-        def save
-            raise NotImplementedError
+        def save(product)
+            product_uri = URI("#{@client.uri}/api/rest/v1/products")
+            query = Net::HTTP::Post.new(product_uri)
+            query.content_type = 'application/json'
+            query['authorization'] = 'Bearer ' + @client.access_token
+            query.body = JSON.generate({
+                identifier: product.identifier,
+                enabled: product.enabled,
+                family: product.family,
+                categories: product.categories,
+                groups: product.groups,
+                parent: product.parent,
+                values: product.values,
+                associations: product.associations
+            })
+
+            res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
+                http.request(query)
+            end
+
+            if (!res.kind_of? Net::HTTPSuccess) then
+                raise res.body
+            end
+
+            return true
         end
     end
 end
