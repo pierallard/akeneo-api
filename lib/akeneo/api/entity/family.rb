@@ -4,7 +4,8 @@ module Akeneo::Api::Entity
 	class Family < Abstract
         def self::properties
             return [
-                :attribute_as_label, :attribute_as_image, :attributes, :attribute_requirements, :labels
+                :code, :attribute_as_label, :attribute_as_image, :attributes, :attribute_requirements, 
+                :labels
             ]
         end
 
@@ -26,6 +27,17 @@ module Akeneo::Api::Entity
             @attributes = params['attributes'] || []
             @attribute_requirements = params['attribute_requirements'] || {}
             @labels = params['labels'] || {}
+        end
+
+        def to_api
+            return {
+                code: code,
+                attribute_as_label: attribute_as_label,
+                attribute_as_image: attribute_as_image,
+                attributes: attributes,
+                attribute_requirements: attribute_requirements,
+                labels: labels
+            }
         end
     end
 end

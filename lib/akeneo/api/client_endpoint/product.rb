@@ -69,39 +69,5 @@ module Akeneo::Api::ClientEndpoint
 
             return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ _client: @_client }))
         end
-
-        def save(product)
-            if (!product._persisted) then
-                product_uri = URI("#{@_client.uri}/api/rest/v1/products")
-                query = Net::HTTP::Post.new(product_uri)
-            else
-                product_uri = URI("#{@_client.uri}/api/rest/v1/products/#{product.identifier}")
-                query = Net::HTTP::Patch.new(product_uri)
-            end
-
-            query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @_client.access_token
-            query.body = JSON.generate({
-                identifier: product.identifier,
-                enabled: product.enabled,
-                family: product.family.try(:code),
-                categories: product.categories,
-                groups: product.groups,
-                parent: product.parent,
-                values: product.values,
-                associations: product.associations
-            })
-
-            res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
-                http.request(query)
-            end
-
-            print res.body
-            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
-
-            product._persisted = true
-
-            return true
-        end
     end
 end

@@ -35,6 +35,23 @@ module Akeneo::Api::Entity
             @associations = params['associations'] || {}
             @created = params['created'].nil? ? Time.now : Time.parse(params['created'])
             @updated = params['updated'].nil? ? Time.now : Time.parse(params['updated'])
+
+            self.class.properties.each do |arg|
+                self.class.class_eval("def #{arg}=(val);super;@updated = Time.now;end")
+            end
+        end
+
+        def to_api
+            return {
+                identifier: identifier,
+                enabled: enabled,
+                family: family.try(:code),
+                categories: categories,
+                groups: groups,
+                parent: parent,
+                values: values,
+                associations: associations
+            }
         end
     end
 end

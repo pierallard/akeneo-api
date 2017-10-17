@@ -17,11 +17,14 @@ module Akeneo::Api::ClientEndpoint
         end
 
         def new(params = {})
-            return self.class.entityClass.new(params.merge({ _client: @_client }))
+            return self.class.entityClass.new(params.merge({
+                _client: @_client,
+                _loaded: true
+            }))
         end
 
-        def find(code)
-            find_uri = URI("#{@_client.uri}/api/rest/v1/#{self.class.url}/#{code}")
+        def find(unique_identifier)
+            find_uri = URI("#{@_client.uri}/api/rest/v1/#{self.class.url}/#{unique_identifier}")
             query = Net::HTTP::Get.new(find_uri)
             query.content_type = 'application/json'
             query['authorization'] = 'Bearer ' + @_client.access_token
@@ -44,6 +47,32 @@ module Akeneo::Api::ClientEndpoint
             	_persisted: true,
             	_loaded: true
         	}))
+        end
+
+
+        def save(entity)
+            if (!entity._persisted) then
+                save_uri = URI("#{@_client.uri}/api/rest/v1/#{self.class.url}")
+                query = Net::HTTP::Post.new(save_uri)
+            else
+                save_uri = URI("#{@_client.uri}/api/rest/v1/#{self.class.url}/#{entity.unique_identifier}")
+                query = Net::HTTP::Patch.new(save_uri)
+            end
+
+            query.content_type = 'application/json'
+            query['authorization'] = 'Bearer ' + @_client.access_token
+            query.body = JSON.generate(entity.to_api)
+
+            res = Net::HTTP.start(save_uri.hostname, save_uri.port) do |http|
+                http.request(query)
+            end
+
+            print res.body
+            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
+
+            entity._persisted = true
+
+            return true
         end
     end
 end	
