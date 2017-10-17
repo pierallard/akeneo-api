@@ -67,12 +67,35 @@ module Akeneo::Api::ClientEndpoint
                 http.request(query)
             end
 
-            print res.body
             raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
 
             entity._persisted = true
 
             return true
+        end
+
+        def first
+            index_uri = URI("#{@_client.uri}/api/rest/v1/#{self.class.url}")
+            params = {}
+            params[:limit] = 1
+            index_uri.query = URI.encode_www_form(params)
+
+            query = Net::HTTP::Get.new(index_uri)
+            query.content_type = 'application/json'
+            query['authorization'] = 'Bearer ' + @_client.access_token
+
+            res = Net::HTTP.start(index_uri.hostname, index_uri.port) do |http|
+              http.request(query)
+            end
+
+            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
+
+            result = JSON.parse(res.body)['_embedded']['items'][0]
+
+            return new(self.class.map_from_api(@_client, result).merge({
+                _persisted: true,
+                _loaded: true
+            }))
         end
     end
 end	
