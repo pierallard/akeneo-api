@@ -37,7 +37,7 @@ module Akeneo::Api::Entity
             @updated = params['updated'].nil? ? Time.now : Time.parse(params['updated'])
 
             self.class.properties.each do |arg|
-                self.class.class_eval("def #{arg}=(val);super;@updated = Time.now;end")
+                self.class.class_eval("def #{arg}=(val);@#{arg} = val;@updated = Time.now;end")
             end
         end
 
