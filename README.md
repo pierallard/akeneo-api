@@ -22,22 +22,18 @@ Next, you can access to entities using the same [API reference](https://api.aken
     product = client.products.find('11704300')
     print product.identifier
     
-    products = client.products.where
-    product.each{|p| print p.identifier}
+    client.products.each{|p| print p.identifier}
+    client.products.map{|p| p.identifier}
+    client.products.first
 
-You can use [more arguments](https://api.akeneo.com/api-reference.html#get_products) or [filters](https://api.akeneo.com/documentation/filter.html) on products
+You can use [more arguments](https://api.akeneo.com/api-reference.html#get_products) or [filters](https://api.akeneo.com/documentation/filter.html) on products.
 
-    products = client.products.where({
-        search: {
-            'enabled': [{ operator: '=', value: true }]
-        },
-        scope: 'ecommerce',
-        locales: ['en_US'],
-        attributes: ['sku'],
-        page: 42,
-        limit: 20,
-        with_count: true
-    })
+    client
+        .products
+        .scope('ecommerce')
+        .attributes(['description'])
+        .search({ 'enabled': [{ operator: '=', value: false }] })
+        .items_count
 
 You can save new entities or existing entities like this:
 

@@ -30,7 +30,7 @@ module Akeneo::Api::Entity
             @categories = params['categories'] || []
             @groups = params['groups'] || []
             @parent = params['parent']
-            @values = params['value'] || {}
+            @values = params['values'] || {}
             @attribute_code = params['attributeCode'] || {}
             @associations = params['associations'] || {}
             @created = params['created'].nil? ? Time.now : Time.parse(params['created'])

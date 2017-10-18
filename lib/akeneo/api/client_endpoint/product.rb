@@ -27,47 +27,28 @@ module Akeneo::Api::ClientEndpoint
             return params
         end
 
-        def where(options = {})
-            product_uri = ''
-            if (!options[:uri].nil?) then
-                product_uri = URI(options[:uri])
-            else
-                product_uri = URI("#{@_client.uri}/api/rest/v1/products")
-                params = {}
-                if (!options[:scope].nil?) then
-                    params[:scope] = options[:scope]
-                end
-                if (!options[:locales].nil?) then
-                    params[:locales] = options[:locales]
-                end
-                if (!options[:attributes].nil?) then
-                    params[:attributes] = options[:attributes]
-                end
-                if (!options[:page].nil?) then
-                    params[:page] = options[:page]
-                end
-                if (!options[:limit].nil?) then
-                    params[:limit] = options[:limit]
-                end
-                if (!options[:with_count].nil?) then
-                    params[:with_count] = options[:with_count]
-                end
-                if (!options[:search].nil?) then
-                    params[:search] = JSON.generate(options[:search])
-                end
-                product_uri.query = URI.encode_www_form(params)
-            end
-            query = Net::HTTP::Get.new(product_uri)
-            query.content_type = 'application/json'
-            query['authorization'] = 'Bearer ' + @_client.access_token
+        def scope(scope)
+            @_params[:scope] = scope
 
-            res = Net::HTTP.start(product_uri.hostname, product_uri.port) do |http|
-              http.request(query)
-            end
+            return self
+        end
 
-            raise Akeneo::Api::QueryException.new(res.body) if (!res.kind_of? Net::HTTPSuccess)
+        def locales(locales = [])
+            @_params[:locales] = locales
 
-            return Akeneo::Api::Entity::ProductSet.new(JSON.parse(res.body).merge({ _client: @_client }))
+            return self
+        end
+
+        def attributes(attributes = [])
+            @_params[:attributes] = attributes
+
+            return self
+        end
+
+        def search(search = {})
+            @_params[:search] = JSON.generate(search)
+
+            return self
         end
     end
 end

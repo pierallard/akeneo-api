@@ -1,7 +1,10 @@
 module Akeneo::Api::ClientEndpoint
     class Abstract
+        attr_accessor :_params
+
         def initialize(_client)
             @_client = _client
+            @_params = {}
         end
 
         def self::entityClass
@@ -25,10 +28,11 @@ module Akeneo::Api::ClientEndpoint
 
         def call(uri, type = Net::HTTP::Get, params = {}, body = {})
             call_uri = URI(uri)
+            call_uri.query = URI.encode_www_form(params) if (!params.empty?)
+
             query = type.new(call_uri)
             query.content_type = 'application/json'
             query['authorization'] = 'Bearer ' + @_client.access_token
-            call_uri.query = URI.encode_www_form(params)
             query.body = JSON.generate(body)
 
             res = Net::HTTP.start(call_uri.hostname, call_uri.port) do |http|
@@ -82,11 +86,19 @@ module Akeneo::Api::ClientEndpoint
             end
         end
 
+        def limit(limit)
+            @_params[:limit] = limit
+
+            return self
+        end
+
         def first
+            limit(1);
+
             result = call(
                 "#{@_client.uri}/api/rest/v1/#{self.class.url}",
                 Net::HTTP::Get,
-                { limit: 1 }
+                @_params
             )
 
             first_result = result['_embedded']['items'][0];
@@ -103,7 +115,8 @@ module Akeneo::Api::ClientEndpoint
             results = []
             response = call(
                 "#{@_client.uri}/api/rest/v1/#{self.class.url}",
-                Net::HTTP::Get
+                Net::HTTP::Get,
+                @_params
             )
 
             continue = true
@@ -124,6 +137,54 @@ module Akeneo::Api::ClientEndpoint
             end
 
             return results
+        end
+
+        def all
+            return each{}
+        end
+
+        def map
+            results = all
+
+            return results.map do |entity| 
+                yield(entity)
+            end
+        end
+
+        def count
+            result = 0
+
+            response = call(
+                "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+                Net::HTTP::Get,
+                @_params
+            )
+
+            continue = true
+            while (continue) 
+                result += response['_embedded']['items'].count
+
+                next_page_uri = response['_links']['next'].try(:[], 'href')
+                if next_page_uri.nil?
+                    continue = false
+                else
+                    response = call(next_page_uri)
+                end
+            end
+
+            return result
+        end
+
+        def items_count
+            @_params[:with_count] = true
+
+            result = call(
+                "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+                Net::HTTP::Get,
+                @_params
+            )
+
+            return result['items_count'];
         end
     end
 end	
