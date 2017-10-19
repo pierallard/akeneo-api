@@ -24,18 +24,6 @@ module Akeneo::Api::Entity
             super
             params = params.with_indifferent_access
 
-            @identifier = params['identifier']
-            @enabled = params['boolean'].nil? ? true : params['boolean']
-            @family = params['family']
-            @categories = params['categories'] || []
-            @groups = params['groups'] || []
-            @parent = params['parent']
-            @values = params['values'] || {}
-            @attribute_code = params['attributeCode'] || {}
-            @associations = params['associations'] || {}
-            @created = params['created'].nil? ? Time.now : Time.parse(params['created'])
-            @updated = params['updated'].nil? ? Time.now : Time.parse(params['updated'])
-
             self.class.properties.each do |arg|
                 self.class.class_eval("def #{arg}=(val);@#{arg} = val;@updated = Time.now;end")
             end

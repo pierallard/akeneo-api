@@ -35,6 +35,10 @@ module Akeneo::Api::Entity
 		    self.class.properties.each do |arg|
 		    	self.class.class_eval("def #{arg}=(val);@#{arg}=val;end")
 		    end
+
+            (self.class.properties).each do |arg|
+                self.send("#{arg}=", params[arg]);
+            end
         end
 
         def unique_identifier

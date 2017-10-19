@@ -23,29 +23,9 @@ module Akeneo::Api::Entity
             super
             params = params.with_indifferent_access
 
-            @code = params['code']
-            @type = params['type']
             @labels = params['labels'] || {}
-            @group = params['group']
-            @sort_order = params['sort_order']
-            @localizable = params['localizable']
-            @scopable = params['scopable']
             @available_locales = params['available_locales'] || []
-            @unique = params['unique']
-            @useable_as_grid_filter = params['useable_as_grid_filter']
-            @max_characters = params['max_characters']
-            @validation_rule = params['validation_rule']
-            @validation_regexp = params['validation_regexp']
-            @wysiwyg_enabled = params['wysiwyg_enabled']
-            @number_min = params['number_min']
-            @number_max = params['number_max']
-            @decimals_allowed = params['decimals_allowed']
-            @negative_allowed = params['negative_allowed']
-            @metric_family = params['metric_family']
-            @date_min = params['date_min']
-            @date_max = params['date_max']
             @allowed_extensions = params['allowed_extensions'] || []
-            @max_file_size = params['max_file_size']
         end
 
         def to_api

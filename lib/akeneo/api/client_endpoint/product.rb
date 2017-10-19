@@ -1,6 +1,5 @@
 require "akeneo/api/entity/product"
 require "akeneo/api/entity/family"
-require "akeneo/api/entity/product_set"
 require 'akeneo/api/query_exception'
 require "akeneo/api/client_endpoint/abstract"
 
@@ -23,6 +22,9 @@ module Akeneo::Api::ClientEndpoint
                     _loaded: false,
                 })
             end
+
+            params['created'] = params['created'].nil? ? Time.now : Time.parse(params['created'])
+            params['updated'] = params['updated'].nil? ? Time.now : Time.parse(params['updated'])
 
             return params
         end
