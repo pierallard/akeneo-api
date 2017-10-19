@@ -20,6 +20,7 @@ module Akeneo::Api::Entity
         def self::new_from_api(client, params = {})
             params[:_persisted] = true
             params[:_loaded] = true
+            params[:_client] = client
 
             return new(params)
         end

@@ -99,9 +99,6 @@ module Akeneo::Api::ClientEndpoint
             first_result = result['_embedded']['items'][0];
 
             return self.class.entityClass.new_from_api(@_client, first_result)
-            #.merge({
-
-            #}))
         end
 
         def each
