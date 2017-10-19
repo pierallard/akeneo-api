@@ -17,6 +17,13 @@ module Akeneo::Api::Entity
             raise NotImplementedError
         end
 
+        def self::new_from_api(client, params = {})
+            params[:_persisted] = true
+            params[:_loaded] = true
+
+            return new(params)
+        end
+
         def to_api
         	return {}
         end

@@ -19,13 +19,17 @@ module Akeneo::Api::Entity
             return :code
         end
 
-        def initialize(params = {})
-            super
-            params = params.with_indifferent_access
+        def self::new_from_api(client, params = {})
+            if (!params['group'].nil?) then
+                params['group'] = Akeneo::Api::Entity::AttributeGroup.new({
+                    code: params['group'],
+                    _client: client,
+                    _persisted: true,
+                    _loaded: false,
+                })
+            end
 
-            @labels = params['labels'] || {}
-            @available_locales = params['available_locales'] || []
-            @allowed_extensions = params['allowed_extensions'] || []
+            return super(client, params)
         end
 
         def to_api

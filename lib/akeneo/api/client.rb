@@ -1,6 +1,7 @@
 require "akeneo/api/client_endpoint/product"
 require "akeneo/api/client_endpoint/family"
 require "akeneo/api/client_endpoint/attribute"
+require "akeneo/api/client_endpoint/attribute-group"
 require 'net/http'
 require 'json'
 
@@ -53,6 +54,10 @@ module Akeneo::Api
 
         def attributes
             return ClientEndpoint::Attribute.new(self)
+        end
+
+        def attribute_groups
+            return ClientEndpoint::AttributeGroup.new(self)
         end
     end
 end

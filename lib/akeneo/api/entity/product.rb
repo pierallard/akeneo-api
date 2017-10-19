@@ -29,6 +29,23 @@ module Akeneo::Api::Entity
             end
         end
 
+        def self::new_from_api(client, params = {})
+            if (!params['family'].nil?) then
+                params['family'] = Akeneo::Api::Entity::Family.new({
+                    code: params['family'],
+                    _client: client,
+                    _persisted: true,
+                    _loaded: false,
+                })
+            end
+
+            params['created'] = params['created'].nil? ? Time.now : Time.parse(params['created'])
+            params['updated'] = params['updated'].nil? ? Time.now : Time.parse(params['updated'])
+
+            return super(client, params)
+        end
+
+
         def to_api
             return {
                 identifier: identifier,

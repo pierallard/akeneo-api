@@ -1,3 +1,5 @@
+require 'active_support/core_ext/object/try'
+
 module Akeneo::Api::ClientEndpoint
     class Abstract
         attr_accessor :_params
@@ -13,10 +15,6 @@ module Akeneo::Api::ClientEndpoint
 
         def self::url
         	raise NotImplementedError
-        end
-
-        def self::map_from_api(client, params)
-        	return params
         end
 
         def new(params = {})
@@ -54,10 +52,7 @@ module Akeneo::Api::ClientEndpoint
             begin
                 result = call("#{@_client.uri}/api/rest/v1/#{self.class.url}/#{unique_identifier}")
 
-                return new(self.class.map_from_api(@_client, result).merge({
-                    _persisted: true,
-                    _loaded: true
-                }))
+                return self.class.entityClass.new_from_api(@_client, result)
             rescue Akeneo::Api::QueryException => e
                 if e.code == 404 then
                     return nil
@@ -103,10 +98,10 @@ module Akeneo::Api::ClientEndpoint
 
             first_result = result['_embedded']['items'][0];
 
-            return new(self.class.map_from_api(@_client, first_result).merge({
-                _persisted: true,
-                _loaded: true
-            }))
+            return self.class.entityClass.new_from_api(@_client, first_result)
+            #.merge({
+
+            #}))
         end
 
         def each
