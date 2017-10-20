@@ -114,10 +114,10 @@ module Akeneo::Api::ClientEndpoint
 			continue = true
 			while (continue) 
 				response['_embedded']['items'].each do |item|
-					product = self.class.entityClass.new(item.merge({ _client: @_client, _persisted: true }))
-					results.push(product)
+					entity = self.class.entityClass.new(item.merge({ _client: @_client, _persisted: true, _loaded: true	 }))
+					results.push(entity)
 
-					yield(product)
+					yield(entity)
 				end
 
 				next_page_uri = response['_links']['next'].try(:[], 'href')
@@ -129,6 +129,14 @@ module Akeneo::Api::ClientEndpoint
 			end
 
 			return results
+		end
+
+		def detect
+			each do |entity|
+				return entity if yield(entity)
+			end
+			
+			return nil
 		end
 
 		def all

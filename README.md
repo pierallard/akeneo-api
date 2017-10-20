@@ -43,6 +43,39 @@ You can save new entities or existing entities like this:
     product.enabled = false
     product.save
 
+Here is a list of some various available commands:
+
+    client.attributes.new({
+        type: 'pim_catalog_number',
+        group: client.attribute_groups.first,
+        code: 'foo'
+    }).save
+
+    client.attribute_groups.new({
+        code: 'bar',
+        labels: {
+            client.locales.find('en_US') => 'baz'
+        }
+    }).save
+
+    client.channels.new({
+        category_tree: 'master',
+        code: 'foo',
+        currencies: [
+            client.currencies.detect(&:enabled)
+        ],
+        locales: [
+            client.locales.first
+        ]
+    }).save
+
+    attribute = client.attributes.detect{|a| a.type === 'pim_catalog_text'}
+    client.families.new({
+        code: '123456789',
+        attribute_as_label: attribute,
+        attributes: [ attribute ]
+    }).save
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

@@ -45,15 +45,33 @@ module Akeneo::Api::Entity
 					})
 			end
 
+			params['labels'] = (params['labels'] || {}).inject({}) do |h, (locale_code, value)|
+				h[Akeneo::Api::Entity::Locale.new({
+					code: locale_code,
+					_client: client,
+					_persisted: true,
+					_loaded: false
+					})] = value
+				h
+			end
+
 			return super(client, params)
+		end
+
+		def initialize(params = {})
+			super
+
+			@labels = {} if @labels.nil?
+			@attributes = [] if @attributes.nil?
+			@attribute_requirements = {} if @attribute_requirements.nil?
 		end
 
 		def to_api
 			return {
 				code: code,
-				attribute_as_label: attribute_as_label,
-				attribute_as_image: attribute_as_image,
-				attributes: attributes,
+				attribute_as_label: attribute_as_label.try(:code),
+				attribute_as_image: attribute_as_image.try(:code),
+				attributes: attributes.map(&:code),
 				attribute_requirements: attribute_requirements,
 				labels: labels
 			}

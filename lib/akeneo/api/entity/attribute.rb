@@ -29,15 +29,41 @@ module Akeneo::Api::Entity
 					})
 			end
 
+			params['labels'] = (params['labels'] || {}).inject({}) do |h, (locale_code, value)|
+				h[Akeneo::Api::Entity::Locale.new({
+					code: locale_code,
+					_client: client,
+					_persisted: true,
+					_loaded: false
+					})] = value
+				h
+			end
+
 			return super(client, params)
+		end
+
+		def initialize(params = {})
+			super
+			params = params.with_indifferent_access
+
+			@labels = {} if @labels.nil?
+			@available_locales = [] if @available_locales.nil?
+			@allowed_extensions = [] if @allowed_extensions.nil?
+			@localizable = false if @localizable.nil?
+			@scopable = false if @scopable.nil?
+			@useable_as_grid_filter = false if @useable_as_grid_filter.nil?
+			@sort_order = 0 if @sort_order.nil?
+			@unique = false if @unique.nil?
+			@decimals_allowed = false if @decimals_allowed.nil?
+			@negative_allowed = false if @negative_allowed.nil?
 		end
 
 		def to_api
 			return {
 				code: code,
 				type: type,
-				labels: labels,
-				group: group,
+				labels: labels.inject({}) {|h, (label, value)| h[label.code] = value; h},
+				group: group.try(:code),
 				sort_order: sort_order,
 				localizable: localizable,
 				scopable: scopable,

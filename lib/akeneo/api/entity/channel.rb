@@ -26,17 +26,45 @@ module Akeneo::Api::Entity
 					})
 			end
 
+			params['currencies'] = (params['currencies'] || []).map do |currency_code|
+				Akeneo::Api::Entity::Currency.new({
+					code: currency_code,
+					_client: client,
+					_persisted: true,
+					_loaded: false,
+					})
+			end
+
+			params['labels'] = (params['labels'] || {}).inject({}) do |h, (locale_code, value)|
+				h[Akeneo::Api::Entity::Locale.new({
+					code: locale_code,
+					_client: client,
+					_persisted: true,
+					_loaded: false
+					})] = value
+				h
+			end
+
 			return super(client, params)
+		end
+
+		def initialize(params = {})
+			super
+
+			@labels = {} if @labels.nil?
+			@locales = [] if @locales.nil?
+			@currencies = [] if @currencies.nil?
+			@conversion_units = {} if @conversion_units.nil?
 		end
 
 		def to_api
 			return {
 				code: code,
 				locales: locales.map(&:code),
-				currencies: currencies,
+				currencies: currencies.map(&:code),
 				category_tree: category_tree,
 				conversion_units: conversion_units,
-				labels: labels
+				labels: labels.inject({}) {|h, (label, value)| h[label.code] = value; h}
 			}
 		end
 	end
