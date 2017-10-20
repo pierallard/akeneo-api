@@ -36,5 +36,12 @@ module Akeneo::Api::ClientEndpoint
 
 			return self
 		end
+
+		def delete(unique_identifier)
+			call(
+				"#{@_client.uri}/api/rest/v1/#{self.class.url}/#{unique_identifier}",
+				Net::HTTP::Delete
+				)
+		end
 	end
 end

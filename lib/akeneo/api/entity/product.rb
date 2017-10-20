@@ -24,9 +24,20 @@ module Akeneo::Api::Entity
 			super
 			params = params.with_indifferent_access
 
+			@enabled = true if @enabled.nil?
+			@categories = [] if @categories.nil?
+			@groups = [] if @groups.nil?
+			@associations = {} if @associations.nil?
+
 			self.class.properties.each do |arg|
 				self.class.class_eval("def #{arg}=(val);@#{arg} = val;@updated = Time.now;end")
 			end
+		end
+
+		def delete
+			raise Akeneo::Api::NoClientException if (@_client.nil?)
+
+			return @_client.products.delete(unique_identifier)
 		end
 
 		def self::new_from_api(client, params = {})
