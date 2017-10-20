@@ -4,6 +4,7 @@ require "akeneo/api/client_endpoint/attribute"
 require "akeneo/api/client_endpoint/attribute-group"
 require "akeneo/api/client_endpoint/locale"
 require "akeneo/api/client_endpoint/channel"
+require "akeneo/api/client_endpoint/currency"
 require 'net/http'
 require 'json'
 
@@ -68,6 +69,10 @@ module Akeneo::Api
 
 		def channels
 			return ClientEndpoint::Channel.new(self)
+		end
+
+		def currencies
+			return ClientEndpoint::Currency.new(self)
 		end
 	end
 end
