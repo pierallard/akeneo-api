@@ -8,8 +8,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :"channels"
+    def endpoint
+      return @_client.channels
     end
 
     def self::unique_identifier

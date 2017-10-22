@@ -17,6 +17,10 @@ module Akeneo::Api::ClientEndpoint
       raise NotImplementedError
     end
 
+    def url
+      return self.class.url
+    end
+
     def new(params = {})
       return self.class.entityClass.new(params.merge({
         _client: @_client,
@@ -50,7 +54,7 @@ module Akeneo::Api::ClientEndpoint
 
     def find(unique_identifier)
       begin
-        result = call("#{@_client.uri}/api/rest/v1/#{self.class.url}/#{unique_identifier}")
+        result = call("#{@_client.uri}/api/rest/v1/#{self.url}/#{unique_identifier}")
 
         return self.class.entityClass.new_from_api(@_client, result)
       rescue Akeneo::Api::QueryException => e
@@ -65,7 +69,7 @@ module Akeneo::Api::ClientEndpoint
     def save(entity)
       if (!entity._persisted) then
         call(
-          "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+          "#{@_client.uri}/api/rest/v1/#{self.url}",
           Net::HTTP::Post,
           {},
           entity.to_api
@@ -73,7 +77,7 @@ module Akeneo::Api::ClientEndpoint
         entity._persisted = true
       else
         call(
-          "#{@_client.uri}/api/rest/v1/#{self.class.url}/#{entity.unique_identifier}",
+          "#{@_client.uri}/api/rest/v1/#{self.url}/#{entity.unique_identifier}",
           Net::HTTP::Patch,
           {},
           entity.to_api
@@ -91,12 +95,14 @@ module Akeneo::Api::ClientEndpoint
       limit(1);
 
       result = call(
-        "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+        "#{@_client.uri}/api/rest/v1/#{self.url}",
         Net::HTTP::Get,
         @_params
         )
 
       first_result = result['_embedded']['items'][0];
+
+      return nil if first_result.nil?
 
       return self.class.entityClass.new_from_api(@_client, first_result)
     end
@@ -106,7 +112,7 @@ module Akeneo::Api::ClientEndpoint
 
       results = []
       response = call(
-        "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+        "#{@_client.uri}/api/rest/v1/#{self.url}",
         Net::HTTP::Get,
         @_params
         )
@@ -155,7 +161,7 @@ module Akeneo::Api::ClientEndpoint
       result = 0
 
       response = call(
-        "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+        "#{@_client.uri}/api/rest/v1/#{self.url}",
         Net::HTTP::Get,
         @_params
         )
@@ -179,12 +185,16 @@ module Akeneo::Api::ClientEndpoint
       @_params[:with_count] = true
 
       result = call(
-        "#{@_client.uri}/api/rest/v1/#{self.class.url}",
+        "#{@_client.uri}/api/rest/v1/#{self.url}",
         Net::HTTP::Get,
         @_params
         )
 
       return result['items_count'];
+    end
+
+    def empty?
+      return first.nil?
     end
   end
 end  

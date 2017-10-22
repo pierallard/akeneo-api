@@ -11,8 +11,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :"product_models"
+    def endpoint
+      return @_client.product_models
     end
 
     def self::unique_identifier
@@ -23,12 +23,23 @@ module Akeneo::Api::Entity
       super
       params = params.with_indifferent_access
 
+      @categories = [] if @categories.nil?
+      @values = {} if @values.nil?
+
       self.class.properties.each do |arg|
         self.class.class_eval("def #{arg}=(val);@#{arg} = val;@updated = Time.now;end")
       end
     end
 
     def self::new_from_api(client, params = {})
+      if (!params['family_variant'].nil?) then
+        params['family_variant'] = Akeneo::Api::Entity::FamilyVariant.new({
+          code: params['family_variant'],
+          _client: client,
+          _persisted: true,
+          _loaded: false,
+        })
+      end
       if (!params['parent'].nil?) then
         params['parent'] = self.new({
           code: params['parent'],
@@ -47,7 +58,7 @@ module Akeneo::Api::Entity
     def to_api
       return {
         code: code,
-        family_variant: family_variant,
+        family_variant: family_variant.try(&:code),
         parent: parent.try(&:code),
         categories: categories,
         values: values,

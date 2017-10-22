@@ -8,8 +8,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :"attribute_groups"
+    def endpoint
+      return @_client.attribute_groups
     end
 
     def self::unique_identifier

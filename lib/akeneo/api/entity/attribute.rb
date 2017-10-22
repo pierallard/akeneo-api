@@ -11,8 +11,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :attributes
+    def endpoint
+      return @_client.attributes
     end
 
     def self::unique_identifier

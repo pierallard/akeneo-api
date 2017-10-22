@@ -8,8 +8,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :"currencies"
+    def endpoint
+      return @_client.currencies
     end
 
     def self::unique_identifier

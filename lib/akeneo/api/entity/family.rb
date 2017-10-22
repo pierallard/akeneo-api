@@ -9,8 +9,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :families
+    def endpoint
+      return @_client.families
     end
 
     def self::unique_identifier
@@ -73,8 +73,12 @@ module Akeneo::Api::Entity
         attribute_as_image: attribute_as_image.try(:code),
         attributes: attributes.map(&:code),
         attribute_requirements: attribute_requirements,
-        labels: labels
+        labels: labels.inject({}) {|h, (label, value)| h[label.code] = value; h}
       }
+    end
+
+    def family_variants
+      return @_client.send(:family_variants, code)
     end
   end
 end

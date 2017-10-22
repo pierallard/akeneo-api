@@ -12,8 +12,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :products
+    def endpoint
+      return @_client.products
     end
 
     def self::unique_identifier
@@ -44,6 +44,15 @@ module Akeneo::Api::Entity
       if (!params['family'].nil?) then
         params['family'] = Akeneo::Api::Entity::Family.new({
           code: params['family'],
+          _client: client,
+          _persisted: true,
+          _loaded: false,
+          })
+      end
+
+      if (!params['parent'].nil?) then
+        params['parent'] = Akeneo::Api::Entity::ProductModel.new({
+          code: params['parent'],
           _client: client,
           _persisted: true,
           _loaded: false,

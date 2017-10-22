@@ -6,6 +6,7 @@ require "akeneo/api/client_endpoint/locale"
 require "akeneo/api/client_endpoint/channel"
 require "akeneo/api/client_endpoint/currency"
 require "akeneo/api/client_endpoint/product_model"
+require "akeneo/api/client_endpoint/family_variant"
 require 'net/http'
 require 'json'
 
@@ -78,6 +79,10 @@ module Akeneo::Api
 
     def product_models
       return ClientEndpoint::ProductModel.new(self)
+    end
+
+    def family_variants(family_code)
+      return ClientEndpoint::FamilyVariant.new(self, family_code)
     end
   end
 end

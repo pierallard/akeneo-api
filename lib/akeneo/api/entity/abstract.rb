@@ -7,8 +7,8 @@ module Akeneo::Api::Entity
       raise NotImplementedError
     end
 
-    def self::endpoint
-      # The name of the endpoint in the client (:families)
+    def endpoint
+      # The endpoint through the client (e.g. @_client.attributes)
       raise NotImplementedError
     end
 
@@ -56,7 +56,7 @@ module Akeneo::Api::Entity
     def load
       raise Akeneo::Api::NoClientException if (@_client.nil?)
 
-      entity = @_client.send(self.class.endpoint).find(unique_identifier)
+      entity = endpoint.find(unique_identifier)
 
       self.class.properties.each do |arg|
         self.send(:"#{arg}=", entity.send(arg))
@@ -68,7 +68,7 @@ module Akeneo::Api::Entity
     def save
       raise Akeneo::Api::NoClientException if (@_client.nil?)
 
-      @_client.send(self.class.endpoint).save(self)
+      endpoint.save(self)
     end
   end
 end

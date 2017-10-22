@@ -71,9 +71,16 @@ Here is a list of some various available commands:
 
     attribute = client.attributes.detect{|a| a.type === 'pim_catalog_text'}
     client.families.new({
-        code: '123456789',
+        code: 'bar',
         attribute_as_label: attribute,
         attributes: [ attribute ]
+    }).save
+
+    family_with_variants = client.families.detect{|f| !f.family_variants.empty?}
+    family_variant_codes = family_with_variants.family_variants.map(&:code)
+    client.product_models.new({
+        code: 'baz'
+        family_variant: family_with_variants.family_variants.first
     }).save
 
 ## Development

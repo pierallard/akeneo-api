@@ -8,8 +8,8 @@ module Akeneo::Api::Entity
       ]
     end
 
-    def self::endpoint
-      return :"locales"
+    def endpoint
+      return @_client.locales
     end
 
     def self::unique_identifier
