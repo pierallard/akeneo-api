@@ -112,9 +112,9 @@ module Akeneo::Api::ClientEndpoint
         )
 
       continue = true
-      while (continue) 
+      while (continue)
         response['_embedded']['items'].each do |item|
-          entity = self.class.entityClass.new(item.merge({ _client: @_client, _persisted: true, _loaded: true   }))
+          entity = self.class.entityClass.new_from_api(@_client, item)
           results.push(entity)
 
           yield(entity)

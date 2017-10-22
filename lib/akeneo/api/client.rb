@@ -1,10 +1,11 @@
 require "akeneo/api/client_endpoint/product"
 require "akeneo/api/client_endpoint/family"
 require "akeneo/api/client_endpoint/attribute"
-require "akeneo/api/client_endpoint/attribute-group"
+require "akeneo/api/client_endpoint/attribute_group"
 require "akeneo/api/client_endpoint/locale"
 require "akeneo/api/client_endpoint/channel"
 require "akeneo/api/client_endpoint/currency"
+require "akeneo/api/client_endpoint/product_model"
 require 'net/http'
 require 'json'
 
@@ -73,6 +74,10 @@ module Akeneo::Api
 
     def currencies
       return ClientEndpoint::Currency.new(self)
+    end
+
+    def product_models
+      return ClientEndpoint::ProductModel.new(self)
     end
   end
 end
