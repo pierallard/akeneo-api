@@ -83,6 +83,11 @@ Here is a list of some various available commands:
         family_variant: family_with_variants.family_variants.first
     }).save
 
+    attribute_with_options = client.attributes.detect do |attribute|
+        ['pim_catalog_simpleselect', 'pim_catalog_multiselect'].include?(attribute.type)
+    end
+    attribute_option_codes = attribute_with_options.attribute_options.map(&:code)
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

@@ -85,5 +85,9 @@ module Akeneo::Api::Entity
         max_file_size: max_file_size
       }
     end
+
+    def attribute_options
+      return @_client.send(:attribute_options, code)
+    end
   end
 end
